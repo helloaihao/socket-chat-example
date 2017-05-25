@@ -25,9 +25,14 @@
   <script>
     $(function () {
       var socket = io();
+      var myName;
+
+      socket.on('set name', function (name) {
+        myName = name;
+      });
 
       $('button').click(function () {
-        socket.emit('chat message', $('#m').val());
+        socket.emit('chat message', myName + ' : ' + $('#m').val());
         $('#m').val('');
       });
       

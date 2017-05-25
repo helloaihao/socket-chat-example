@@ -8,8 +8,11 @@ const io = require('socket.io')(server);
 
 app.use(serve(path.join(__dirname, '/')));
 
+let uid = 1;
+
 io.on('connection', (socket) => {
   console.log('a user connected');
+  socket.emit('set name', `user${uid ++}`);
 
   socket.on('disconnect', () => console.log('user disconnected'));
 
