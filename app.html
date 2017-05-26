@@ -12,7 +12,7 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
       .hide {display: none;}
-      #onlineList {height: 20px; width: 100%;}
+      #onlineList {height: 20px; width: 100%; color: #fff; background: #0664c2}
     </style>
   </head>
   <body>
@@ -53,19 +53,20 @@
       // 显示"正在输入"功能
       socket.on('typing', function (id) {
         // 存在"正在输入"行
-        if ($('#user' + id + 'Status').length) {
-          $('#user' + id + 'Status').show();
+        if ($('#user' + id + 'Status').length === 0) {
+          $('#messages').append($('<li id="user' + id + 'Status">').text('user' + id + ' typing...'));
+
+          // 增加一个去抖函数 1.5 秒后隐藏"正在输入"
+          if( !debounceShow[id] ) {
+            debounceShow[id] = _.debounce(function () {
+              $('#user' + id + 'Status').remove();
+            }, 1500); 
+          }
+
           // 执行所有去抖函数
           debounceShow.forEach(function(fn) {
             fn.call(fn);
           });
-        } else {
-          $('#messages').append($('<li id="user' + id + 'Status" class="hide">').text('user' + id + ' typing...'));
-          
-          // 增加一个去抖函数 1.5 秒后隐藏"正在输入"
-          debounceShow[id] = _.debounce(function () {
-            $('#user' + id + 'Status').hide();
-          }, 1500);
         }
       });
 
