@@ -2,6 +2,17 @@
 
 基于 socket.io 的聊天室
 
+# 快速开始
+
+安装 git、node
+
+```
+  git clone git@github.com:helloaihao/socket-chat-example.git
+  cd socket-chat-example
+  npm install
+  node index
+```
+
 # 项目截图
 
 ![](https://github.com/helloaihao/socket-chat-example/blob/master/pic.png)
