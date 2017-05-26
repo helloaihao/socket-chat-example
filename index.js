@@ -14,7 +14,7 @@ let uid = 1;
 io.on('connection', (socket) => {
   socket.emit('set name', `user${uid}`);
   socket.request.headers.cookie += `; id=${uid}`;
-  
+
   const connectedMsg = `user${uid} connected`;
   console.log(connectedMsg);
   io.emit('chat message', connectedMsg);
@@ -27,7 +27,7 @@ io.on('connection', (socket) => {
     io.emit('chat message', disMsg);
   });
 
-  socket.on('chat message', (msg) => io.emit('chat message', msg));
+  socket.on('chat message', (msg) =>  socket.broadcast.emit('chat message', msg));
 });
 
 server.listen(3000);

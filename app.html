@@ -32,8 +32,10 @@
       });
 
       $('button').click(function () {
-        socket.emit('chat message', myName + ' : ' + $('#m').val());
+        var seedMsg = myName + ' : ' + $('#m').val();
+        socket.emit('chat message', seedMsg);
         $('#m').val('');
+        $('#messages').append($('<li>').text(seedMsg));
       });
       
       socket.on('chat message', function (msg) {
