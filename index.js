@@ -10,7 +10,7 @@ const io = require('socket.io')(server);
 app.use(serve(path.join(__dirname, '/')));
 
 let uid = 1; // 用户 id
-
+let onlineIds = [];
 // 用户连接事件
 io.on('connection', (socket) => {
   socket.emit('set name', `user${uid}`);
@@ -20,13 +20,22 @@ io.on('connection', (socket) => {
   console.log(connectedMsg);
   io.emit('chat message', connectedMsg);  // 新用户用户连接消息
   
+  onlineIds.push(uid);  // 添加到在线用户列表
+  io.emit('online id list', onlineIds);
   uid ++;
 
   // 用户断开连接
   socket.on('disconnect', () => {
-    const disMsg = `user${cookie.parse(socket.request.headers.cookie).id} disconnect`;
+    const disId = cookie.parse(socket.request.headers.cookie).id;
+    const disMsg = `user${disId} disconnect`;
     console.log(disMsg);
     io.emit('chat message', disMsg);  // 用户离线消息
+
+    onlineIds = onlineIds.filter(function (id) {
+      return id !== +disId;
+    });
+    console.log(onlineIds);
+    io.emit('online id list', onlineIds);
   });
 
   // 接收用户消息并转发给除自己之外的所有人

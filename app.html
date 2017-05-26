@@ -12,9 +12,11 @@
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
       .hide {display: none;}
+      #onlineList {height: 20px; width: 100%;}
     </style>
   </head>
   <body>
+    <div id="onlineList"></div>
     <ul id="messages"></ul>
     <form onsubmit="return false;">
       <input id="m" autocomplete="off" /><button>Send</button>
@@ -70,6 +72,19 @@
       $('input')[0].oninput = function () {
         socket.emit('typing');
       };
+
+      // 显示在线用户
+      socket.on('online id list', function (ids) {
+        const onlineHtml = ids.map(function (id) {
+          if (('user' + id) === myName) {
+            return '<span>user' + id + '(self)</span>'
+          } else {
+            return '<span>user' + id + '</span>'
+          }
+        }).join('、');
+
+        $('#onlineList').html('<span>online users: </span>' + onlineHtml);
+      });
       
     });
   </script>
