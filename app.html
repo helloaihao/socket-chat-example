@@ -11,6 +11,7 @@
       #messages { list-style-type: none; margin: 0; padding: 0; }
       #messages li { padding: 5px 10px; }
       #messages li:nth-child(odd) { background: #eee; }
+      .hide {display: none;}
     </style>
   </head>
   <body>
@@ -22,15 +23,19 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.js"></script>
+  <script src="https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js"></script>
   <script>
     $(function () {
-      var socket = io();
-      var myName;
-
+      var socket = io(),
+          myName,
+          debounceShow = [];
+      
+      // 储存用户名
       socket.on('set name', function (name) {
         myName = name;
       });
 
+      // 发送消息
       $('button').click(function () {
         var seedMsg = myName + ' : ' + $('#m').val();
         socket.emit('chat message', seedMsg);
@@ -38,9 +43,33 @@
         $('#messages').append($('<li>').text(seedMsg));
       });
       
+      // 接收消息
       socket.on('chat message', function (msg) {
         $('#messages').append($('<li>').text(msg));
       });
+
+      // 显示"正在输入"功能
+      socket.on('typing', function (id) {
+        // 存在"正在输入"行
+        if ($('#user' + id + 'Status').length) {
+          $('#user' + id + 'Status').show();
+          // 执行所有去抖函数
+          debounceShow.forEach(function(fn) {
+            fn.call(fn);
+          });
+        } else {
+          $('#messages').append($('<li id="user' + id + 'Status" class="hide">').text('user' + id + ' typing...'));
+          
+          // 增加一个去抖函数 1.5 秒后隐藏"正在输入"
+          debounceShow[id] = _.debounce(function () {
+            $('#user' + id + 'Status').hide();
+          }, 1500);
+        }
+      });
+
+      $('input')[0].oninput = function () {
+        socket.emit('typing');
+      };
       
     });
   </script>
